@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EnarXena - Minimalist Bio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            user-select: none;
+            background-color: #000;
+        }
+        .bio-card {
+            background: rgba(12, 12, 16, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.9);
+        }
+        .glow-link {
+            transition: all 0.25s ease;
+        }
+        .glow-link:hover {
+            color: #ffffff;
+            text-shadow: 0 0 12px rgba(255, 255, 255, 0.9), 0 0 25px rgba(255, 255, 255, 0.5);
+        }
+        .name-glow {
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+        }
+        #enterScreen {
+            transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</head>
+<body class="w-screen h-screen relative flex items-center justify-center text-white">
+
+    <div id="bgContainer" class="absolute inset-0 -z-25 bg-cover bg-center bg-no-repeat transition-all duration-300" style="background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1920&auto=format&fit=crop');"></div>
+    
+    <video id="bgVideo" autoplay loop muted playsinline class="absolute inset-0 -z-30 w-full h-full object-cover hidden transition-all duration-300"></video>
+    <div id="bgOverlay" class="absolute inset-0 -z-20 transition-all duration-300 pointer-events-none" style="background-color: rgba(0, 0, 0, 0);"></div>
+
+    <audio id="bgAudio" loop crossorigin="anonymous"></audio>
+
+    <div id="enterScreen" class="fixed inset-0 z-50 bg-black/95 flex flex-col items-center justify-center cursor-pointer">
+        <div class="text-center px-4">
+            <h1 class="text-2xl sm:text-3xl font-bold tracking-tight mb-2 text-white name-glow">EnarXena</h1>
+            <p class="text-gray-400 text-xs tracking-widest uppercase mb-6 font-light">click anywhere to enter</p>
+            <div class="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center mx-auto text-white/60 animate-bounce">
+                <i class="fa-solid fa-chevron-down text-xs"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="absolute top-6 left-6 z-30 flex items-center gap-4">
+        <div class="flex items-center gap-2 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
+            <button onclick="toggleMute()" id="muteBtn" class="text-white/80 hover:text-white transition text-sm">
+                <i id="muteIcon" class="fa-solid fa-volume-high"></i>
+            </button>
+            <input type="range" id="volumeSlider" min="0" max="1" step="0.05" value="0.5" 
+                   class="w-20 accent-white cursor-pointer h-1 bg-white/20 rounded-lg" oninput="changeVolume(this.value)">
+        </div>
+
+        <div class="relative">
+            <button onclick="toggleInfoBox()" id="infoToggleBtn" class="w-9 h-9 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/80 hover:text-white hover:bg-black/60 transition">
+                <i class="fa-solid fa-info text-xs"></i>
+            </button>
+
+            <div id="infoBox" class="absolute left-0 top-12 w-64 bg-black/85 backdrop-blur-xl border border-white/15 rounded-2xl p-3.5 shadow-2xl hidden flex flex-col gap-1.5 text-xs text-gray-300">
+                <!-- Populated dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <button onclick="openSettings()" class="absolute top-6 right-6 z-30 w-9 h-9 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/80 hover:text-white hover:bg-black/60 transition" title="Настройки">
+        <i class="fa-solid fa-gear text-xs"></i>
+    </button>
+
+    <main class="z-20 w-[90%] max-w-[340px] sm:max-w-[380px]">
+        <div class="bio-card rounded-3xl p-6 sm:p-8 flex flex-col items-center text-center">
+            
+            <div class="relative mb-4">
+                <img id="profileAvatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=300&auto=format&fit=crop" 
+                     alt="Avatar" class="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border border-white/15 shadow-2xl">
+            </div>
+
+            <h2 id="profileName" class="text-xl sm:text-2xl font-bold tracking-tight text-white mb-6 name-glow">
+                EnarXena
+            </h2>
+
+            <div id="linksContainer" class="flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-sm sm:text-base font-medium text-gray-300">
+                <!-- Dynamically rendered links with smart separator handling -->
+            </div>
+
+        </div>
+    </main>
+
+    <div id="settingsModal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md hidden items-center justify-center p-4">
+        <div class="bio-card w-full max-w-md rounded-3xl p-6 sm:p-8 max-h-[90vh] overflow-y-auto border border-white/15 text-left">
+            <div class="flex items-center justify-between mb-6 pb-3 border-b border-white/10">
+                <h3 class="text-sm font-bold tracking-wider uppercase text-white">Настройка страницы</h3>
+                <button onclick="closeSettings()" class="text-gray-400 hover:text-white">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-[11px] font-medium text-gray-400 mb-1">Никнейм</label>
+                    <input type="text" id="inputName" class="w-full bg-black/60 border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-white/50">
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-medium text-gray-400 mb-1">Загрузить аватар (картинка / GIF)</label>
+                    <input type="file" id="inputAvatarFile" accept="image/*" class="w-full text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-white/10 file:text-white hover:file:bg-white/25 cursor-pointer">
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-medium text-gray-400 mb-1">Загрузить обои (картинка / видео / GIF)</label>
+                    <input type="file" id="inputBgFile" accept="image/*,video/*" class="w-full text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-white/10 file:text-white hover:file:bg-white/25 cursor-pointer">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 bg-black/40 p-3 rounded-xl border border-white/10">
+                    <div>
+                        <div class="flex justify-between text-[11px] text-gray-400 mb-1">
+                            <span>Затемнение фона</span>
+                            <span id="darknessVal">0%</span>
+                        </div>
+                        <input type="range" id="inputDarkness" min="0" max="100" value="0" step="1" 
+                               class="w-full accent-white cursor-pointer h-1 bg-white/20 rounded-lg" oninput="updateDarknessLabel(this.value)">
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-[11px] text-gray-400 mb-1">
+                            <span>Замыливание (Blur)</span>
+                            <span id="blurVal">0px</span>
+                        </div>
+                        <input type="range" id="inputBlur" min="0" max="20" value="0" step="1" 
+                               class="w-full accent-white cursor-pointer h-1 bg-white/20 rounded-lg" oninput="updateBlurLabel(this.value)">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-medium text-gray-400 mb-1">Загрузить фоновую музыку (MP3)</label>
+                    <input type="file" id="inputMusicFile" accept="audio/*" class="w-full text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-white/10 file:text-white hover:file:bg-white/25 cursor-pointer">
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-medium text-gray-400 mb-1">Строки в инфо-окне (каждая с новой строки)</label>
+                    <textarea id="inputInfo" rows="3" class="w-full bg-black/60 border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-white/50"></textarea>
+                </div>
+
+                <div class="pt-2">
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="text-[11px] font-medium text-gray-400 uppercase tracking-wide">Ссылки</label>
+                        <button onclick="addLinkField()" class="text-xs bg-white/10 hover:bg-white/20 px-2.5 py-1 rounded-lg text-white transition flex items-center gap-1">
+                            <i class="fa-solid fa-plus text-[10px]"></i> Добавить
+                        </button>
+                    </div>
+                    <div id="linksInputsContainer" class="space-y-3"></div>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3 mt-8 pt-4 border-t border-white/10">
+                <button onclick="saveSettings()" class="flex-1 py-3 bg-white text-black hover:bg-gray-200 rounded-xl font-semibold text-xs tracking-wider uppercase transition">
+                    Сохранить
+                </button>
+                <button onclick="resetDefaults()" class="px-4 py-3 bg-white/10 text-gray-300 hover:text-white rounded-xl font-semibold text-xs transition">
+                    Сброс
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const defaultConfig = {
+            name: "EnarXena",
+            avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=300&auto=format&fit=crop",
+            bgUrl: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1920&auto=format&fit=crop",
+            bgType: "image", // image or video
+            darkness: 0, // 0 to 100 percentage
+            blur: 0, // 0 to 20 px
+            musicUrl: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf756.mp3?filename=lofi-study-112191.mp3",
+            infoLines: [
+                "• участник клана Ez",
+                "• участник XIII Squad",
+                "• Dota2 · CS2 · osu! player"
+            ],
+            links: [
+                { name: "Discord", url: "https://discord.com" },
+                { name: "Telegram", url: "https://t.me" },
+                { name: "Steam", url: "https://steamcommunity.com" },
+                { name: "Instagram", url: "https://instagram.com" }
+            ]
+        };
+
+        let config = JSON.parse(localStorage.getItem('enarxena_local_config')) || defaultConfig;
+        let isPlaying = false;
+        let isMuted = false;
+        const audio = document.getElementById('bgAudio');
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderPage();
+            setupAudio();
+
+            const enterScreen = document.getElementById('enterScreen');
+            enterScreen.addEventListener('click', () => {
+                enterScreen.style.opacity = '0';
+                setTimeout(() => {
+                    enterScreen.style.display = 'none';
+                }, 600);
+                
+                if (!isPlaying) {
+                    audio.play().then(() => {
+                        isPlaying = true;
+                    }).catch(e => console.log("Audio play blocked:", e));
+                }
+            });
+        });
+
+        function setupAudio() {
+            audio.src = config.musicUrl;
+            audio.volume = document.getElementById('volumeSlider').value;
+            audio.load();
+        }
+
+        function changeVolume(val) {
+            audio.volume = val;
+            isMuted = (val == 0);
+            updateMuteIcon();
+        }
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            if (isMuted) {
+                audio.muted = true;
+                document.getElementById('volumeSlider').value = 0;
+            } else {
+                audio.muted = false;
+                document.getElementById('volumeSlider').value = 0.5;
+                audio.volume = 0.5;
+            }
+            updateMuteIcon();
+        }
+
+        function updateMuteIcon() {
+            const icon = document.getElementById('muteIcon');
+            if (audio.muted || audio.volume == 0) {
+                icon.className = "fa-solid fa-volume-xmark text-red-400";
+            } else {
+                icon.className = "fa-solid fa-volume-high";
+            }
+        }
+
+        function toggleInfoBox() {
+            const box = document.getElementById('infoBox');
+            box.classList.toggle('hidden');
+        }
+
+        window.addEventListener('click', (e) => {
+            const infoBox = document.getElementById('infoBox');
+            const toggleBtn = document.getElementById('infoToggleBtn');
+            if (!infoBox.contains(e.target) && !toggleBtn.contains(e.target)) {
+                infoBox.classList.add('hidden');
+            }
+        });
+
+        function updateDarknessLabel(val) {
+            document.getElementById('darknessVal').textContent = val + '%';
+        }
+
+        function updateBlurLabel(val) {
+            document.getElementById('blurVal').textContent = val + 'px';
+        }
+
+        function renderPage() {
+            document.getElementById('profileName').textContent = config.name;
+            document.getElementById('profileAvatar').src = config.avatar;
+
+            const bgContainer = document.getElementById('bgContainer');
+            const bgVideo = document.getElementById('bgVideo');
+            const bgOverlay = document.getElementById('bgOverlay');
+
+            // Apply background darkening and blur
+            const alpha = (config.darkness || 0) / 100;
+            bgOverlay.style.backgroundColor = `rgba(0, 0, 0, ${alpha})`;
+            
+            const blurPx = (config.blur || 0) + 'px';
+            bgContainer.style.filter = `blur(${blurPx})`;
+            bgVideo.style.filter = `blur(${blurPx})`;
+
+            if (config.bgType === 'video') {
+                bgVideo.src = config.bgUrl;
+                bgVideo.classList.remove('hidden');
+                bgContainer.style.backgroundImage = 'none';
+            } else {
+                bgVideo.classList.add('hidden');
+                bgVideo.src = '';
+                bgContainer.style.backgroundImage = `url('${config.bgUrl}')`;
+            }
+
+            const infoBox = document.getElementById('infoBox');
+            infoBox.innerHTML = '';
+            config.infoLines.forEach(line => {
+                const div = document.createElement('div');
+                div.className = "flex items-center gap-2 text-white/90";
+                div.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span><span>${line}</span>`;
+                infoBox.appendChild(div);
+            });
+
+            // Filter out empty links so no empty gaps or stray dots ever appear
+            const activeLinks = config.links.filter(l => l.name && l.name.trim() !== "");
+            const container = document.getElementById('linksContainer');
+            container.innerHTML = '';
+
+            activeLinks.forEach((link, idx) => {
+                const a = document.createElement('a');
+                a.href = link.url || "#";
+                a.target = "_blank";
+                a.rel = "noopener noreferrer";
+                a.className = "glow-link cursor-pointer";
+                a.textContent = link.name;
+                container.appendChild(a);
+
+                // Add dot separator ONLY between actually rendered active links
+                if (idx < activeLinks.length - 1) {
+                    const sep = document.createElement('span');
+                    sep.className = "text-white/40 mx-1.5";
+                    sep.textContent = "·";
+                    container.appendChild(sep);
+                }
+            });
+        }
+
+        function openSettings() {
+            document.getElementById('inputName').value = config.name;
+            document.getElementById('inputInfo').value = config.infoLines.join('\n');
+            document.getElementById('inputDarkness').value = config.darkness || 0;
+            document.getElementById('darknessVal').textContent = (config.darkness || 0) + '%';
+            document.getElementById('inputBlur').value = config.blur || 0;
+            document.getElementById('blurVal').textContent = (config.blur || 0) + 'px';
+            document.getElementById('inputAvatarFile').value = '';
+            document.getElementById('inputBgFile').value = '';
+            document.getElementById('inputMusicFile').value = '';
+
+            renderLinksInputs();
+
+            const modal = document.getElementById('settingsModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeSettings() {
+            const modal = document.getElementById('settingsModal');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+        }
+
+        function renderLinksInputs() {
+            const container = document.getElementById('linksInputsContainer');
+            container.innerHTML = '';
+            config.links.forEach((link, index) => {
+                const div = document.createElement('div');
+                div.className = "flex items-center gap-2 bg-black/50 p-2.5 rounded-xl border border-white/10";
+                div.innerHTML = `
+                    <input type="text" value="${link.name}" placeholder="Имя" class="w-1/3 bg-black/60 border border-white/15 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none" oninput="updateLinkField(${index}, 'name', this.value)">
+                    <input type="text" value="${link.url}" placeholder="URL" class="flex-1 bg-black/60 border border-white/15 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none" oninput="updateLinkField(${index}, 'url', this.value)">
+                    <button onclick="removeLinkField(${index})" class="text-red-400 hover:text-red-300 p-1.5 text-xs"><i class="fa-solid fa-trash"></i></button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function updateLinkField(index, field, value) {
+            config.links[index][field] = value;
+        }
+
+        function addLinkField() {
+            config.links.push({ name: "", url: "" });
+            renderLinksInputs();
+        }
+
+        function removeLinkField(index) {
+            config.links.splice(index, 1);
+            renderLinksInputs();
+        }
+
+        function saveSettings() {
+            config.name = document.getElementById('inputName').value;
+            config.darkness = parseInt(document.getElementById('inputDarkness').value) || 0;
+            config.blur = parseInt(document.getElementById('inputBlur').value) || 0;
+
+            const infoText = document.getElementById('inputInfo').value;
+            config.infoLines = infoText.split('\n').filter(line => line.trim() !== "");
+
+            const avatarFile = document.getElementById('inputAvatarFile').files[0];
+            const bgFile = document.getElementById('inputBgFile').files[0];
+            const musicFile = document.getElementById('inputMusicFile').files[0];
+
+            let pendingReads = 0;
+            const checkDone = () => {
+                pendingReads--;
+                if (pendingReads <= 0) {
+                    finalizeSave();
+                }
+            };
+
+            if (avatarFile) {
+                pendingReads++;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    config.avatar = e.target.result;
+                    checkDone();
+                };
+                reader.readAsDataURL(avatarFile);
+            }
+
+            if (bgFile) {
+                pendingReads++;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    config.bgUrl = e.target.result;
+                    config.bgType = bgFile.type.startsWith('video') ? 'video' : 'image';
+                    checkDone();
+                };
+                reader.readAsDataURL(bgFile);
+            }
+
+            if (musicFile) {
+                pendingReads++;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    config.musicUrl = e.target.result;
+                    setupAudio();
+                    if (isPlaying) audio.play();
+                    checkDone();
+                };
+                reader.readAsDataURL(musicFile);
+            }
+
+            if (pendingReads === 0) {
+                finalizeSave();
+            }
+        }
+
+        function finalizeSave() {
+            localStorage.setItem('enarxena_local_config', JSON.stringify(config));
+            renderPage();
+            closeSettings();
+        }
+
+        function resetDefaults() {
+            if (confirm("Сбросить настройки к начальным?")) {
+                localStorage.removeItem('enarxena_local_config');
+                config = JSON.parse(JSON.stringify(defaultConfig));
+                renderPage();
+                setupAudio();
+                closeSettings();
+            }
+        }
+    </script>
+</body>
+</html>
