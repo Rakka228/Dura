@@ -15,7 +15,6 @@
             background-color: #000;
         }
         .bio-card {
-            background-color: rgba(12, 12, 16, 0.5); /* 50% затемнение карточки */
             border: 1px solid rgba(255, 255, 255, 0.12);
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.85);
             backdrop-filter: blur(12px);
@@ -39,16 +38,16 @@
 <body class="w-screen h-screen relative flex items-center justify-center text-white">
 
     <!-- Фоновое видео -->
-    <video id="bgVideo" autoplay loop muted playsinline class="absolute inset-0 -z-30 w-full h-full object-cover" src="background.mp4"></video>
+    <video id="bgVideo" autoplay loop muted playsinline class="absolute inset-0 -z-30 w-full h-full object-cover"></video>
     <div class="absolute inset-0 -z-20 pointer-events-none" style="background-color: rgba(0, 0, 0, 0);"></div>
 
-    <!-- Аудио (звук ветра) -->
-    <audio id="bgAudio" loop crossorigin="anonymous" src="wind.mp3"></audio>
+    <!-- Аудио -->
+    <audio id="bgAudio" loop crossorigin="anonymous"></audio>
 
     <!-- Экран входа -->
     <div id="enterScreen" class="fixed inset-0 z-50 bg-black/95 flex flex-col items-center justify-center cursor-pointer">
         <div class="text-center px-4">
-            <h1 class="text-2xl sm:text-3xl font-bold tracking-tight mb-2 text-white name-glow">EnarXena</h1>
+            <h1 id="screenTitle" class="text-2xl sm:text-3xl font-bold tracking-tight mb-2 text-white name-glow">EnarXena</h1>
             <p class="text-gray-400 text-xs tracking-widest uppercase mb-6 font-light">click anywhere to enter</p>
             <div class="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center mx-auto text-white/60 animate-bounce">
                 <i class="fa-solid fa-chevron-down text-xs"></i>
@@ -56,7 +55,7 @@
         </div>
     </div>
 
-    <!-- Верхняя панель (звук и кнопка i слева) -->
+    <!-- Верхняя панель (громкость и инфо кнопка, без шестеренки) -->
     <div class="absolute top-6 left-6 z-30 flex items-center gap-4">
         <div class="flex items-center gap-2 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
             <button onclick="toggleMute()" id="muteBtn" class="text-white/80 hover:text-white transition text-sm">
@@ -72,50 +71,107 @@
             </button>
 
             <div id="infoBox" class="absolute left-0 top-12 w-64 bg-[#0c0c10] border border-white/15 rounded-2xl p-3.5 shadow-2xl hidden flex flex-col gap-1.5 text-xs text-gray-300">
-                <div class="flex items-center gap-2 text-white/90"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span><span>• участник клана Ez</span></div>
-                <div class="flex items-center gap-2 text-white/90"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span><span>• участник XIII Squad</span></div>
-                <div class="flex items-center gap-2 text-white/90"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span><span>• Dota2 · CS2 · osu! player</span></div>
+                <!-- Заполняется автоматически из конфигурации ниже -->
             </div>
         </div>
     </div>
 
     <!-- Карточка профиля -->
     <main class="z-20 w-[90%] max-w-[340px] sm:max-w-[380px]">
-        <div class="bio-card rounded-3xl p-6 sm:p-8 flex flex-col items-center text-center">
+        <div id="bioCard" class="bio-card rounded-3xl p-6 sm:p-8 flex flex-col items-center text-center">
             
             <div class="relative mb-4">
-                <!-- Аватарка -->
-                <img src="0342e12c0e32d373bc57c43401802554.jpg" 
-                     alt="Avatar" class="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border border-white/15 shadow-2xl">
+                <img id="profileAvatar" src="" alt="Avatar" class="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border border-white/15 shadow-2xl">
             </div>
 
-            <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-white mb-6 name-glow">
-                EnarXena
-            </h2>
+            <h2 id="profileName" class="text-xl sm:text-2xl font-bold tracking-tight text-white mb-6 name-glow"></h2>
 
-            <!-- Ссылки -->
-            <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-sm sm:text-base font-medium text-gray-300">
-                <a href="https://discord.com" target="_blank" rel="noopener noreferrer" class="glow-link cursor-pointer">Discord</a>
-                <span class="text-white/40 mx-1.5">·</span>
-                <a href="https://t.me" target="_blank" rel="noopener noreferrer" class="glow-link cursor-pointer">Telegram</a>
-                <span class="text-white/40 mx-1.5">·</span>
-                <a href="https://steamcommunity.com" target="_blank" rel="noopener noreferrer" class="glow-link cursor-pointer">Steam</a>
-                <span class="text-white/40 mx-1.5">·</span>
-                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="glow-link cursor-pointer">Instagram</a>
+            <div id="linksContainer" class="flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-sm sm:text-base font-medium text-gray-300">
+                <!-- Ссылки генерируются автоматически -->
             </div>
 
         </div>
     </main>
 
     <script>
+        // ==========================================
+        // НАСТРОЙКИ САЙТА (РЕДАКТИРУЙТЕ ТУТ)
+        // ==========================================
+        const config = {
+            name: "EnarXena",
+            avatar: "0342e12c0e32d373bc57c43401802554.jpg", // Имя файла вашей аватарки
+            bgUrl: "background.mp4",                        // Имя файла вашего видеофона
+            cardOpacity: 50,                                // Затемнение карточки в процентах (0-100)
+            musicUrl: "wind.mp3",                           // Имя файла звука ветра
+            
+            // Текст внутри выпадающего окна по кнопке "i"
+            infoLines: [
+                "• участник клана Ez",
+                "• участник XIII Squad",
+                "• Dota2 · CS2 · osu! player"
+            ],
+            
+            // Ваши ссылки (добавляйте или удаляйте прямо здесь)
+            links: [
+                { name: "Discord", url: "https://discord.com" },
+                { name: "Telegram", url: "https://t.me" },
+                { name: "Steam", url: "https://steamcommunity.com" },
+                { name: "Instagram", url: "https://instagram.com" }
+            ]
+        };
+        // ==========================================
+
         let isPlaying = false;
         let isMuted = false;
         const audio = document.getElementById('bgAudio');
 
         document.addEventListener('DOMContentLoaded', () => {
+            // Применяем настройки из объекта выше
+            document.getElementById('profileName').textContent = config.name;
+            document.getElementById('screenTitle').textContent = config.name;
+            document.getElementById('profileAvatar').src = config.avatar;
+            document.getElementById('bgVideo').src = config.bgUrl;
+
+            // Затемнение карточки
+            const alpha = config.cardOpacity / 100;
+            document.getElementById('bioCard').style.backgroundColor = `rgba(12, 12, 16, ${alpha})`;
+
+            // Инфо-блок
+            const infoBox = document.getElementById('infoBox');
+            infoBox.innerHTML = '';
+            config.infoLines.forEach(line => {
+                const div = document.createElement('div');
+                div.className = "flex items-center gap-2 text-white/90";
+                div.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span><span>${line}</span>`;
+                infoBox.appendChild(div);
+            });
+
+            // Ссылки
+            const linksContainer = document.getElementById('linksContainer');
+            linksContainer.innerHTML = '';
+            config.links.forEach((link, idx) => {
+                const a = document.createElement('a');
+                a.href = link.url;
+                a.target = "_blank";
+                a.rel = "noopener noreferrer";
+                a.className = "glow-link cursor-pointer";
+                a.textContent = link.name;
+                linksContainer.appendChild(a);
+
+                if (idx < config.links.length - 1) {
+                    const sep = document.createElement('span');
+                    sep.className = "text-white/40 mx-1.5";
+                    sep.textContent = "·";
+                    linksContainer.appendChild(sep);
+                }
+            });
+
+            // Аудио
+            audio.src = config.musicUrl;
             audio.volume = document.getElementById('volumeSlider').value;
             audio.load();
 
+            // Клик для входа и старта музыки
             const enterScreen = document.getElementById('enterScreen');
             enterScreen.addEventListener('click', () => {
                 enterScreen.style.opacity = '0';
