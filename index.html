@@ -40,14 +40,12 @@
 
     <!-- Фоновое видео -->
     <video id="bgVideo" autoplay loop muted playsinline class="absolute inset-0 -z-30 w-full h-full object-cover" src="background.mp4"></video>
-    
-    <!-- Затемнение фона (если нужно) -->
     <div class="absolute inset-0 -z-20 pointer-events-none" style="background-color: rgba(0, 0, 0, 0);"></div>
 
     <!-- Аудио (звук ветра) -->
     <audio id="bgAudio" loop crossorigin="anonymous" src="wind.mp3"></audio>
 
-    <!-- Экран входа для активации звука -->
+    <!-- Экран входа -->
     <div id="enterScreen" class="fixed inset-0 z-50 bg-black/95 flex flex-col items-center justify-center cursor-pointer">
         <div class="text-center px-4">
             <h1 class="text-2xl sm:text-3xl font-bold tracking-tight mb-2 text-white name-glow">EnarXena</h1>
@@ -58,7 +56,7 @@
         </div>
     </div>
 
-    <!-- Верхняя панель (звук и инфо) -->
+    <!-- Верхняя панель (звук и кнопка i слева) -->
     <div class="absolute top-6 left-6 z-30 flex items-center gap-4">
         <div class="flex items-center gap-2 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
             <button onclick="toggleMute()" id="muteBtn" class="text-white/80 hover:text-white transition text-sm">
@@ -81,22 +79,22 @@
         </div>
     </div>
 
-    <!-- Основная карточка профиля -->
+    <!-- Карточка профиля -->
     <main class="z-20 w-[90%] max-w-[340px] sm:max-w-[380px]">
-        <div id="bioCard" class="bio-card rounded-3xl p-6 sm:p-8 flex flex-col items-center text-center">
+        <div class="bio-card rounded-3xl p-6 sm:p-8 flex flex-col items-center text-center">
             
             <div class="relative mb-4">
                 <!-- Аватарка -->
-                <img id="profileAvatar" src="0342e12c0e32d373bc57c43401802554.jpg" 
+                <img src="0342e12c0e32d373bc57c43401802554.jpg" 
                      alt="Avatar" class="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border border-white/15 shadow-2xl">
             </div>
 
-            <h2 id="profileName" class="text-xl sm:text-2xl font-bold tracking-tight text-white mb-6 name-glow">
+            <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-white mb-6 name-glow">
                 EnarXena
             </h2>
 
             <!-- Ссылки -->
-            <div id="linksContainer" class="flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-sm sm:text-base font-medium text-gray-300">
+            <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-sm sm:text-base font-medium text-gray-300">
                 <a href="https://discord.com" target="_blank" rel="noopener noreferrer" class="glow-link cursor-pointer">Discord</a>
                 <span class="text-white/40 mx-1.5">·</span>
                 <a href="https://t.me" target="_blank" rel="noopener noreferrer" class="glow-link cursor-pointer">Telegram</a>
