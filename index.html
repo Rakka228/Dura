@@ -136,8 +136,8 @@
             infoBox.innerHTML = '';
             config.infoLines.forEach(line => {
                 const div = document.createElement('div');
-                div.className = "flex items-center gap-2 text-white/90";
-                div.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span><span>${line}</span>`;
+                div.className = "text-white/90 leading-relaxed";
+                div.textContent = line;
                 infoBox.appendChild(div);
             });
 
