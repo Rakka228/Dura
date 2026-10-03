@@ -15,11 +15,11 @@
             background-color: #000;
         }
         .bio-card {
-            background: rgba(12, 12, 16, 0.85);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: background-color 0.3s ease, border-color 0.3s ease;
         }
         .glow-link {
             transition: all 0.25s ease;
@@ -38,12 +38,15 @@
 </head>
 <body class="w-screen h-screen relative flex items-center justify-center text-white">
 
-    <div id="bgContainer" class="absolute inset-0 -z-25 bg-cover bg-center bg-no-repeat transition-all duration-300" style="background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1920&auto=format&fit=crop');"></div>
+    <div id="bgContainer" class="absolute inset-0 -z-25 bg-cover bg-center bg-no-repeat transition-all duration-300"></div>
     
-    <video id="bgVideo" autoplay loop muted playsinline class="absolute inset-0 -z-30 w-full h-full object-cover hidden transition-all duration-300"></video>
+    <!-- Подключено ваше фоновое видео background.mp4 -->
+    <video id="bgVideo" autoplay loop muted playsinline class="absolute inset-0 -z-30 w-full h-full object-cover transition-all duration-300" src="background.mp4"></video>
+    
     <div id="bgOverlay" class="absolute inset-0 -z-20 transition-all duration-300 pointer-events-none" style="background-color: rgba(0, 0, 0, 0);"></div>
 
-    <audio id="bgAudio" loop crossorigin="anonymous"></audio>
+    <!-- Аудио для звука ветра (замените src на имя вашего аудиофайла, например wind.mp3) -->
+    <audio id="bgAudio" loop crossorigin="anonymous" src="wind.mp3"></audio>
 
     <div id="enterScreen" class="fixed inset-0 z-50 bg-black/95 flex flex-col items-center justify-center cursor-pointer">
         <div class="text-center px-4">
@@ -56,7 +59,7 @@
     </div>
 
     <div class="absolute top-6 left-6 z-30 flex items-center gap-4">
-        <div class="flex items-center gap-2 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
+        <div class="flex items-center gap-2 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
             <button onclick="toggleMute()" id="muteBtn" class="text-white/80 hover:text-white transition text-sm">
                 <i id="muteIcon" class="fa-solid fa-volume-high"></i>
             </button>
@@ -65,25 +68,25 @@
         </div>
 
         <div class="relative">
-            <button onclick="toggleInfoBox()" id="infoToggleBtn" class="w-9 h-9 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/80 hover:text-white hover:bg-black/60 transition">
+            <button onclick="toggleInfoBox()" id="infoToggleBtn" class="w-9 h-9 rounded-full bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/80 hover:text-white hover:bg-black/80 transition">
                 <i class="fa-solid fa-info text-xs"></i>
             </button>
 
-            <div id="infoBox" class="absolute left-0 top-12 w-64 bg-black/85 backdrop-blur-xl border border-white/15 rounded-2xl p-3.5 shadow-2xl hidden flex flex-col gap-1.5 text-xs text-gray-300">
-                <!-- Populated dynamically -->
+            <div id="infoBox" class="absolute left-0 top-12 w-64 bg-[#0c0c10] border border-white/15 rounded-2xl p-3.5 shadow-2xl hidden flex flex-col gap-1.5 text-xs text-gray-300">
             </div>
         </div>
     </div>
 
-    <button onclick="openSettings()" class="absolute top-6 right-6 z-30 w-9 h-9 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/80 hover:text-white hover:bg-black/60 transition" title="Настройки">
+    <button onclick="openSettings()" class="absolute top-6 right-6 z-30 w-9 h-9 rounded-full bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/80 hover:text-white hover:bg-black/80 transition" title="Настройки">
         <i class="fa-solid fa-gear text-xs"></i>
     </button>
 
     <main class="z-20 w-[90%] max-w-[340px] sm:max-w-[380px]">
-        <div class="bio-card rounded-3xl p-6 sm:p-8 flex flex-col items-center text-center">
+        <div id="bioCard" class="bio-card rounded-3xl p-6 sm:p-8 flex flex-col items-center text-center">
             
             <div class="relative mb-4">
-                <img id="profileAvatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=300&auto=format&fit=crop" 
+                <!-- Подключена ваша аватарка -->
+                <img id="profileAvatar" src="0342e12c0e32d373bc57c43401802554.jpg" 
                      alt="Avatar" class="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border border-white/15 shadow-2xl">
             </div>
 
@@ -92,14 +95,13 @@
             </h2>
 
             <div id="linksContainer" class="flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-sm sm:text-base font-medium text-gray-300">
-                <!-- Dynamically rendered links with smart separator handling -->
             </div>
 
         </div>
     </main>
 
     <div id="settingsModal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md hidden items-center justify-center p-4">
-        <div class="bio-card w-full max-w-md rounded-3xl p-6 sm:p-8 max-h-[90vh] overflow-y-auto border border-white/15 text-left">
+        <div class="bio-card w-full max-w-md rounded-3xl p-6 sm:p-8 max-h-[90vh] overflow-y-auto border border-white/15 text-left bg-[#0c0c10]/95">
             <div class="flex items-center justify-between mb-6 pb-3 border-b border-white/10">
                 <h3 class="text-sm font-bold tracking-wider uppercase text-white">Настройка страницы</h3>
                 <button onclick="closeSettings()" class="text-gray-400 hover:text-white">
@@ -123,18 +125,26 @@
                     <input type="file" id="inputBgFile" accept="image/*,video/*" class="w-full text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-white/10 file:text-white hover:file:bg-white/25 cursor-pointer">
                 </div>
 
-                <div class="grid grid-cols-2 gap-3 bg-black/40 p-3 rounded-xl border border-white/10">
+                <div class="grid grid-cols-3 gap-2 bg-black/40 p-3 rounded-xl border border-white/10">
                     <div>
-                        <div class="flex justify-between text-[11px] text-gray-400 mb-1">
-                            <span>Затемнение фона</span>
+                        <div class="flex justify-between text-[10px] text-gray-400 mb-1">
+                            <span>Карточка</span>
+                            <span id="cardOpacityVal">50%</span>
+                        </div>
+                        <input type="range" id="inputCardOpacity" min="10" max="100" value="50" step="1" 
+                               class="w-full accent-white cursor-pointer h-1 bg-white/20 rounded-lg" oninput="updateCardOpacityLabel(this.value)">
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-[10px] text-gray-400 mb-1">
+                            <span>Фон затемн.</span>
                             <span id="darknessVal">0%</span>
                         </div>
                         <input type="range" id="inputDarkness" min="0" max="100" value="0" step="1" 
                                class="w-full accent-white cursor-pointer h-1 bg-white/20 rounded-lg" oninput="updateDarknessLabel(this.value)">
                     </div>
                     <div>
-                        <div class="flex justify-between text-[11px] text-gray-400 mb-1">
-                            <span>Замыливание (Blur)</span>
+                        <div class="flex justify-between text-[10px] text-gray-400 mb-1">
+                            <span>Размытие</span>
                             <span id="blurVal">0px</span>
                         </div>
                         <input type="range" id="inputBlur" min="0" max="20" value="0" step="1" 
@@ -176,13 +186,14 @@
 
     <script>
         const defaultConfig = {
-            name: "Rakka",
-            avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=300&auto=format&fit=crop",
+            name: "EnarXena",
+            avatar: "0342e12c0e32d373bc57c43401802554.jpg",
             bgUrl: "background.mp4",
-            bgType: "video", // image or video
-            darkness: 0, // 0 to 100 percentage
-            blur: 0, // 0 to 20 px
-            musicUrl: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf756.mp3?filename=lofi-study-112191.mp3",
+            bgType: "video",
+            darkness: 0,
+            blur: 0,
+            cardOpacity: 50, // Выставлено 50% затемнения/прозрачности карточки по умолчанию
+            musicUrl: "wind.mp3",
             infoLines: [
                 "• участник клана Ez",
                 "• участник XIII Squad",
@@ -267,6 +278,10 @@
             }
         });
 
+        function updateCardOpacityLabel(val) {
+            document.getElementById('cardOpacityVal').textContent = val + '%';
+        }
+
         function updateDarknessLabel(val) {
             document.getElementById('darknessVal').textContent = val + '%';
         }
@@ -279,13 +294,16 @@
             document.getElementById('profileName').textContent = config.name;
             document.getElementById('profileAvatar').src = config.avatar;
 
+            const opacityPercent = config.cardOpacity !== undefined ? config.cardOpacity : 50;
+            const alpha = opacityPercent / 100;
+            document.getElementById('bioCard').style.backgroundColor = `rgba(12, 12, 16, ${alpha})`;
+
             const bgContainer = document.getElementById('bgContainer');
             const bgVideo = document.getElementById('bgVideo');
             const bgOverlay = document.getElementById('bgOverlay');
 
-            // Apply background darkening and blur
-            const alpha = (config.darkness || 0) / 100;
-            bgOverlay.style.backgroundColor = `rgba(0, 0, 0, ${alpha})`;
+            const darkAlpha = (config.darkness || 0) / 100;
+            bgOverlay.style.backgroundColor = `rgba(0, 0, 0, ${darkAlpha})`;
             
             const blurPx = (config.blur || 0) + 'px';
             bgContainer.style.filter = `blur(${blurPx})`;
@@ -310,7 +328,6 @@
                 infoBox.appendChild(div);
             });
 
-            // Filter out empty links so no empty gaps or stray dots ever appear
             const activeLinks = config.links.filter(l => l.name && l.name.trim() !== "");
             const container = document.getElementById('linksContainer');
             container.innerHTML = '';
@@ -324,7 +341,6 @@
                 a.textContent = link.name;
                 container.appendChild(a);
 
-                // Add dot separator ONLY between actually rendered active links
                 if (idx < activeLinks.length - 1) {
                     const sep = document.createElement('span');
                     sep.className = "text-white/40 mx-1.5";
@@ -337,10 +353,16 @@
         function openSettings() {
             document.getElementById('inputName').value = config.name;
             document.getElementById('inputInfo').value = config.infoLines.join('\n');
+            
+            const cardOp = config.cardOpacity !== undefined ? config.cardOpacity : 50;
+            document.getElementById('inputCardOpacity').value = cardOp;
+            document.getElementById('cardOpacityVal').textContent = cardOp + '%';
+
             document.getElementById('inputDarkness').value = config.darkness || 0;
             document.getElementById('darknessVal').textContent = (config.darkness || 0) + '%';
             document.getElementById('inputBlur').value = config.blur || 0;
             document.getElementById('blurVal').textContent = (config.blur || 0) + 'px';
+            
             document.getElementById('inputAvatarFile').value = '';
             document.getElementById('inputBgFile').value = '';
             document.getElementById('inputMusicFile').value = '';
@@ -389,6 +411,7 @@
 
         function saveSettings() {
             config.name = document.getElementById('inputName').value;
+            config.cardOpacity = parseInt(document.getElementById('inputCardOpacity').value) || 50;
             config.darkness = parseInt(document.getElementById('inputDarkness').value) || 0;
             config.blur = parseInt(document.getElementById('inputBlur').value) || 0;
 
