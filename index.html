@@ -99,32 +99,29 @@
         // ==========================================
         const config = {
             name: "Rakka",
-            avatar: "0342e12c0e32d373bc57c43401802554.jpg", // Имя файла вашей аватарки
-            bgUrl: "background.mp4",                        // Имя файла вашего видеофона
-            cardOpacity: 50,                                // Затемнение карточки в процентах (0-100)
-            musicUrl: "wind.mp3",                           // Имя файла звука ветра
+            avatar: "0342e12c0e32d373bc57c43401802554.jpg",
+            bgUrl: "background.mp4",
+            cardOpacity: 50, // Затемнение карточки в процентах (0-100)
+            musicUrl: "wind.mp3",
             
-            // Текст внутри выпадающего окна по кнопке "i"
             infoLines: [
-                "я загадала: если эта серокрылая в меня поверит, я буду прощена."
-               "я убедила себя в том, что случится чудо."
-            ],
+                `я загадала: если эта серокрылая в меня поверит, я буду прощена.`,
+                `я убедила себя в том, что случится чудо.`
             ],
             
-            // Ваши ссылки (добавляйте или удаляйте прямо здесь)
             links: [
-                { name: "Discord", url: "https://discord.com/users/1128863511561383976" },
-                { name: "Steam", url: "https://steamcommunity.com/profiles/76561199231645538/" }
+                { name: "Discord", url: "https://discord.com" },
+                { name: "Telegram", url: "https://t.me" },
+                { name: "Steam", url: "https://steamcommunity.com" },
+                { name: "Instagram", url: "https://instagram.com" }
             ]
         };
         // ==========================================
 
-        let isPlaying = false;
-        let isMuted = false;
         const audio = document.getElementById('bgAudio');
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Применяем настройки из объекта выше
+            // Применяем настройки
             document.getElementById('profileName').textContent = config.name;
             document.getElementById('screenTitle').textContent = config.name;
             document.getElementById('profileAvatar').src = config.avatar;
@@ -169,7 +166,7 @@
             audio.volume = document.getElementById('volumeSlider').value;
             audio.load();
 
-            // Клик для входа и старта музыки
+            // Жесткий обработчик клика — теперь экран гарантированно закроется с первого клика
             const enterScreen = document.getElementById('enterScreen');
             enterScreen.addEventListener('click', () => {
                 enterScreen.style.opacity = '0';
@@ -177,29 +174,23 @@
                     enterScreen.style.display = 'none';
                 }, 600);
                 
-                if (!isPlaying) {
-                    audio.play().then(() => {
-                        isPlaying = true;
-                    }).catch(e => console.log("Audio play blocked:", e));
-                }
+                audio.play().catch(e => {
+                    console.log("Audio play prevented by browser:", e);
+                });
             });
         });
 
         function changeVolume(val) {
             audio.volume = val;
-            isMuted = (val == 0);
             updateMuteIcon();
         }
 
         function toggleMute() {
-            isMuted = !isMuted;
-            if (isMuted) {
-                audio.muted = true;
+            audio.muted = !audio.muted;
+            if (audio.muted) {
                 document.getElementById('volumeSlider').value = 0;
             } else {
-                audio.muted = false;
-                document.getElementById('volumeSlider').value = 0.5;
-                audio.volume = 0.5;
+                document.getElementById('volumeSlider').value = audio.volume || 0.5;
             }
             updateMuteIcon();
         }
